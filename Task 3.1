@@ -1,0 +1,41 @@
+#include <math.h>
+
+const int B = 4275;               // B value of the thermistor
+const int R0 = 100000;            // R0 = 100kΩ
+const int pinTempSensor = A0;     // Grove - Temperature Sensor connected to A0
+
+const int samplingInterval = 1000;  // 1 sample per second
+const int collectionTime = 180;     // 3 minutes = 180 seconds
+float temperatureData[collectionTime]; // Array to store temperature readings
+
+void collect_temperature_data() {
+    for (int i = 0; i < collectionTime; i++) {
+        int a = analogRead(pinTempSensor); // Read analog value
+
+        float R = (1023.0 / (float)a) - 1.0;
+        R = R0 * R;
+
+        float temperature = 1.0 / (log(R / R0) / B + 1 / 298.15) - 273.15; // Convert to Celsius
+
+        temperatureData[i] = temperature; // Store in array
+
+        Serial.print("Sample ");
+        Serial.print(i + 1);
+        Serial.print(": Temperature = ");
+        Serial.println(temperature);
+
+        delay(samplingInterval); // Maintain 1-second sampling interval
+    }
+}
+
+void setup() {
+    Serial.begin(9600);
+    delay(1000); // Allow serial monitor to initialize
+}
+
+void loop() {
+    Serial.println("Starting new temperature collection cycle...");
+    collect_temperature_data(); // Collect data for 3 minutes
+    Serial.println("Cycle complete. Restarting...");
+    delay(1000); // 1-second pause before restarting the next cycle
+}
