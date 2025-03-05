@@ -1,0 +1,71 @@
+#include <math.h>
+
+#define N 180  // 3 minutes of data, 1 sample per second
+#define FS 1.0 // Sampling frequency (1 sample per second)
+
+const int B = 4275;               // B value of the thermistor
+const int R0 = 100000;            // R0 = 100kΩ
+const int pinTempSensor = A0;     // Temperature Sensor connected to A0
+
+int samplingInterval = 1000;  // 1 sample per second (1000ms)
+float temperatureData[N];  // Array to store temperature readings
+
+float magniture[N]; // store magnitude values
+
+// Function to collect temperature data
+void collect_temperature_data() {
+    for (int i = 0; i < N; i++) {
+        int a = analogRead(pinTempSensor); // Read analog value
+
+        float R = (1023.0 / (float)a) - 1.0;
+        R = R0 * R;
+
+        float temperature = 1.0 / (log(R / R0) / B + 1 / 298.15) - 273.15; // Convert to Celsius
+
+        temperatureData[i] = temperature; // Store in array
+
+        Serial.print("Sample ");
+        Serial.print(i + 1);
+        Serial.print(": Temperature = ");
+        Serial.println(temperature);
+
+        delay(samplingInterval); // Maintain 1-second sampling interval
+    }
+}
+
+// Function to apply DFT
+
+void apply_dft(){
+  float real[N];
+  float imag[N];
+
+  for (int k=0; k<N; k++){
+    real[k] = 0.0;
+    imag[k] = 0.0;
+  }
+
+  for (int n=0, n<N, n++){
+    float angle = 2.0*M_PI*k*n/N
+    real[k] += [n]*cos(angle);
+    imag[k]-= [n]*sin(angle);
+  }
+
+  fequency[k] = k * FS / N
+
+  magnitude[k] = sqrt(real[k]*real[k] + imag[k]*imag[k])
+
+
+  Serial.print
+}
+
+void setup() {
+    Serial.begin(9600);
+    delay(1000); // Allow serial monitor to initialize
+}
+
+void loop() {
+    collect_temperature_data();  // Collect 3 minutes of temperature data
+    Serial.println("Temperature data collection complete.");
+    
+    delay(5000);  // Wait before restarting
+}
