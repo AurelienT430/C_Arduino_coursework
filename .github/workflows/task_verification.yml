@@ -1,0 +1,34 @@
+name: Verify Git Tasks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Verify Task 1.3 (Branch Deletion)
+        run: |
+          if git branch -r | grep "origin/test-branch"; then
+            echo "❌ Task 1.3: Test branch still exists. Please delete it."
+            exit 1
+          else
+            echo "✅ Task 1.3: Test branch deleted successfully!"
+          fi
+
+      - name: Verify Task 1.4 (Merge Conflict Resolution)
+        run: |
+          if git log --oneline | grep "Resolved merge conflict in project-notes.md"; then
+            echo "✅ Task 1.4: Merge conflict resolved successfully!"
+          else
+            echo "❌ Task 1.4: No merge conflict resolution detected!"
+            exit 1
+          fi
